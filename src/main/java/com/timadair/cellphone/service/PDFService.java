@@ -1,5 +1,6 @@
 package com.timadair.cellphone.service;
 
+import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -7,6 +8,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.TextAlignment;
 import com.timadair.cellphone.data.EmployeeUsageSummary;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -15,7 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ public class PDFService {
 
     // DETAILS
     Table detailsTable = new Table(4 + monthsCovered.size() * 2);
+    detailsTable.setFontSize(8.0f);
     addTableHeaders(monthsCovered, detailsTable);
     addTableDetails(detailsTable, phoneUsageByEmployee, monthsCovered);
 
@@ -59,15 +61,26 @@ public class PDFService {
   }
 
   private void addTableHeaders(List<YearMonth> monthsCovered, Table detailsTable) {
-    detailsTable.addHeaderCell("Employee ID");
-    detailsTable.addHeaderCell("Name");
-    detailsTable.addHeaderCell("Model");
-    detailsTable.addHeaderCell("Purchase Date");
+
+    detailsTable.addHeaderCell(headerCell("Employee ID"));
+    detailsTable.addHeaderCell(headerCell("Name"));
+    detailsTable.addHeaderCell(headerCell("Model"));
+    detailsTable.addHeaderCell(headerCell("Purchase Date"));
     for (YearMonth yearMonth : monthsCovered) {
       Cell headerCell = new Cell(1, 2);
+      headerCell.setBackgroundColor(ColorConstants.LIGHT_GRAY);
+      headerCell.setTextAlignment(TextAlignment.CENTER);
       headerCell.add(new Paragraph(yearMonth.format(DateTimeFormatter.ofPattern("LLL yyyy"))));
       detailsTable.addHeaderCell(headerCell);
     }
+  }
+
+  private Cell headerCell(String text) {
+    Cell cell = new Cell();
+    cell.setBackgroundColor(ColorConstants.LIGHT_GRAY);
+    cell.add(new Paragraph(text));
+    cell.setTextAlignment(TextAlignment.CENTER);
+    return cell;
   }
 
   private void addTableDetails(Table detailsTable, Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, List<YearMonth> monthsCovered) {
@@ -81,10 +94,14 @@ public class PDFService {
           detailsTable.addCell(usageSummary.getPhonePurchaseDate().format(DATE_FORMAT));
           Map<YearMonth, Pair<Integer, Float>> usage = usageSummary.getUsage();
           for (YearMonth yearMonth : monthsCovered) {
-            detailsTable.addCell("0");
-            detailsTable.addCell("0.0 MB");
+            if (usage.containsKey(yearMonth)) {
+              detailsTable.addCell(usage.get(yearMonth).getLeft().toString());
+              detailsTable.addCell(usage.get(yearMonth).getRight().toString() + " MB");
+            } else {
+              detailsTable.addCell("-");
+              detailsTable.addCell("-");
+            }
           }
         });
-
   }
 }
