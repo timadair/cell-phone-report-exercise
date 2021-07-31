@@ -1,7 +1,7 @@
 # cell-phone-report-exercise
 
 ## Usage
-
+Build the jar using **mvn clean install**, then run the report with **java -jar .\target\cell-phone-report-exercise-1.0-SNAPSHOT.jar**
 
 ## Libraries
 **Apache PDFBox**  
