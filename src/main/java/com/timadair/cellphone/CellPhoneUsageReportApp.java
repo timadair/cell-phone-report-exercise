@@ -11,10 +11,9 @@ import javax.print.PrintServiceLookup;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.util.List;
 
 import static java.nio.file.Files.newInputStream;
@@ -25,16 +24,17 @@ public class CellPhoneUsageReportApp {
   public static final String REPORT_FILE_DEST = "./src/main/resources/tmp/UsageReport.pdf";
 
   public static void main(String[] args) throws IOException {
+    LocalDate reportStartDate = LocalDate.parse("2017-09-21");
+    LocalDate reportEndDate = LocalDate.parse("2018-09-20");
+
     DataService dataService = new DataService();
     PDFService pdfService = new PDFService();
     List<CellPhone> employeePhones = dataService.getCellPhoneRecords(CELL_PHONE_CSV_PATH);
-    System.out.println(employeePhones);
 
-    pdfService.render(employeePhones, REPORT_FILE_DEST);
+    pdfService.render(employeePhones, REPORT_FILE_DEST, reportStartDate, reportEndDate);
 
-    printPDFFile(Paths.get(REPORT_FILE_DEST));
-
-    Files.delete(Paths.get(REPORT_FILE_DEST));
+//    printPDFFile(Paths.get(REPORT_FILE_DEST));
+//    Files.delete(Paths.get(REPORT_FILE_DEST));
   }
 
   private static void printPDFFile(Path samplePdfPath) {

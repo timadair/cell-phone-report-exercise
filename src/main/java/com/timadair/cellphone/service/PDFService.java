@@ -7,22 +7,35 @@ import com.itextpdf.layout.element.Paragraph;
 import com.timadair.cellphone.data.CellPhone;
 
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class PDFService {
-  public void render(List<CellPhone> employeePhones, String s) throws FileNotFoundException {
-    PdfWriter writer = new PdfWriter(s);
 
+  public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("LLL dd',' yyyy");
+
+  public void render(List<CellPhone> employeePhones, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate) throws FileNotFoundException {
     //Initialize PDF document
+    PdfWriter writer = new PdfWriter(destinationFilePath);
     PdfDocument pdf = new PdfDocument(writer);
-
-    // Initialize document
     Document document = new Document(pdf);
 
-    //Add paragraph to the document
-    document.add(new Paragraph(employeePhones.toString()));
+    //HEADERS
+    document.add(new Paragraph("Report Date: " + LocalDateTime.now().format(DATE_FORMAT)));
+    // Assume the report should also include the timespan covered the report should cover.
+    // These dates could be extracted from the data, but assuming that not every day will have data, it seems
+    //   more likely they'd be passed in as parameters for a database query.
+    document.add(new Paragraph("Report Date Range: " + reportStartDate.format(DATE_FORMAT) + " - " + reportEndDate.format(DATE_FORMAT)));
+    document.add(new Paragraph("# Phones: " + employeePhones.size()));
+    document.add(new Paragraph("Total Minutes: " + "Placeholder 3000"));
+    document.add(new Paragraph("Average Minutes per employee: " + "Placeholder 500"));
+    document.add(new Paragraph("Total Data: " + "Placeholder 60 MB"));
+    document.add(new Paragraph("Average Data per employee: " + "Placeholder 10 MB"));
 
-    //Close document
+    // DETAILS
+    document.add(new Paragraph(employeePhones.toString()));
     document.close();
   }
 }
