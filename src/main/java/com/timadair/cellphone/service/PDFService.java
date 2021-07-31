@@ -4,13 +4,13 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
-import com.timadair.cellphone.data.CellPhone;
+import com.timadair.cellphone.data.EmployeeUsageSummary;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Renders PDF reports
@@ -19,7 +19,7 @@ public class PDFService {
 
   public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("LLL dd',' yyyy");
 
-  public void renderMonthlyCellPhoneUsageReport(List<CellPhone> employeePhones, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate) throws FileNotFoundException {
+  public void renderMonthlyCellPhoneUsageReport(Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate) throws FileNotFoundException {
     //Initialize PDF document
     PdfWriter writer = new PdfWriter(destinationFilePath);
     PdfDocument pdf = new PdfDocument(writer);
@@ -31,14 +31,14 @@ public class PDFService {
     // These dates could be extracted from the data, but assuming that not every day will have data, it seems
     //   more likely they'd be passed in as parameters for a database query.
     document.add(new Paragraph("Report Date Range: " + reportStartDate.format(DATE_FORMAT) + " - " + reportEndDate.format(DATE_FORMAT)));
-    document.add(new Paragraph("# Phones: " + employeePhones.size()));
+    document.add(new Paragraph("# Phones: " + phoneUsageByEmployee.size()));
     document.add(new Paragraph("Total Minutes: " + "Placeholder 3000"));
     document.add(new Paragraph("Average Minutes per employee: " + "Placeholder 500"));
     document.add(new Paragraph("Total Data: " + "Placeholder 60 MB"));
     document.add(new Paragraph("Average Data per employee: " + "Placeholder 10 MB"));
 
     // DETAILS
-    document.add(new Paragraph(employeePhones.toString()));
+    document.add(new Paragraph(phoneUsageByEmployee.toString()));
     document.close();
   }
 }

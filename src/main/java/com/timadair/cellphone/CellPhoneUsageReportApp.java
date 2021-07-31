@@ -1,7 +1,9 @@
 package com.timadair.cellphone;
 
 import com.timadair.cellphone.data.CellPhone;
+import com.timadair.cellphone.data.EmployeeUsageSummary;
 import com.timadair.cellphone.data.UsageEntry;
+import com.timadair.cellphone.service.DataProcessingService;
 import com.timadair.cellphone.service.DataService;
 import com.timadair.cellphone.service.PDFService;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -16,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static java.nio.file.Files.newInputStream;
 
@@ -31,10 +34,12 @@ public class CellPhoneUsageReportApp {
 
     DataService dataService = new DataService();
     PDFService pdfService = new PDFService();
+    DataProcessingService dataProcessingService = new DataProcessingService();
+
     List<CellPhone> employeePhones = dataService.getCellPhoneRecords(CELL_PHONE_CSV_PATH);
     List<UsageEntry> usageEntries = dataService.getUsageRecords(USAGE_CSV_PATH);
-
-    pdfService.renderMonthlyCellPhoneUsageReport(employeePhones, REPORT_FILE_DEST, reportStartDate, reportEndDate);
+    Map<Integer, EmployeeUsageSummary> phoneUsage = dataProcessingService.processPhoneUsage(employeePhones, usageEntries);
+    pdfService.renderMonthlyCellPhoneUsageReport(phoneUsage, REPORT_FILE_DEST, reportStartDate, reportEndDate);
 
 //    printPDFFile(Paths.get(REPORT_FILE_DEST));
 //    Files.delete(Paths.get(REPORT_FILE_DEST));
