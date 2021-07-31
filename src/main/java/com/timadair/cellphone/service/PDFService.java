@@ -49,16 +49,16 @@ public class PDFService {
   }
 
   private void addReportHeaders(PhoneUsageReportData phoneUsageByEmployee, LocalDate reportStartDate, LocalDate reportEndDate, Document document) {
-    document.add(new Paragraph("Report Date: " + LocalDateTime.now().format(DATE_FORMAT)));
+    document.add(new Paragraph("Employee Phone Usage Report for " + reportStartDate.format(DATE_FORMAT) + " - " + reportEndDate.format(DATE_FORMAT)).setFontSize(18));
+    document.add(new Paragraph("Printed " + LocalDateTime.now().format(DATE_FORMAT)).setFontSize(9));
     // Assume the report should also include the timespan covered the report should cover.
     // These dates could be extracted from the data, but assuming that not every day will have data, it seems
     //   more likely they'd be passed in as parameters for a database query.
-    document.add(new Paragraph("Report Date Range: " + reportStartDate.format(DATE_FORMAT) + " - " + reportEndDate.format(DATE_FORMAT)));
-    document.add(new Paragraph("# Phones: " + phoneUsageByEmployee.getPhoneCount()));
-    document.add(new Paragraph("Total Minutes: " + phoneUsageByEmployee.getTotalMinutes()));
-    document.add(new Paragraph("Average Minutes per employee: " + phoneUsageByEmployee.getAverageMinutes()));
-    document.add(new Paragraph("Total Data: " + phoneUsageByEmployee.getTotalData() + " MB"));
-    document.add(new Paragraph("Average Data per employee: " + phoneUsageByEmployee.getAverageData() + " MB"));
+    document.add(new Paragraph(phoneUsageByEmployee.getPhoneCount() + " phones"));
+    document.add(new Paragraph(phoneUsageByEmployee.getTotalMinutes() + " minutes total"));
+    document.add(new Paragraph(phoneUsageByEmployee.getAverageMinutes() + " minutes average per employee"));
+    document.add(new Paragraph(phoneUsageByEmployee.getTotalData() + " MB data used"));
+    document.add(new Paragraph(phoneUsageByEmployee.getAverageData() + " MB used per employee"));
   }
 
   private void addTableHeaders(List<YearMonth> monthsCovered, Table detailsTable) {
