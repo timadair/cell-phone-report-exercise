@@ -20,10 +20,15 @@ public class CellPhoneUsageReportApp {
   public static final Path SAMPLE_PDF_PATH = Paths.get("./src/main/resources/pdf-sample.pdf");
 
   public static void main(String[] args) {
+    printPDFFile(SAMPLE_PDF_PATH);
+
+  }
+
+  private static void printPDFFile(Path samplePdfPath) {
     PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
     PrinterJob job = PrinterJob.getPrinterJob();
 
-    try (InputStream fileStream = newInputStream(SAMPLE_PDF_PATH, StandardOpenOption.READ)) {
+    try (InputStream fileStream = newInputStream(samplePdfPath, StandardOpenOption.READ)) {
       PDDocument document = PDDocument.load(fileStream);
       job.setPageable(new PDFPageable(document));
       job.setPrintService(printService);
@@ -31,6 +36,5 @@ public class CellPhoneUsageReportApp {
     } catch (PrinterException | IOException ex) {
       ex.printStackTrace();
     }
-
   }
 }
