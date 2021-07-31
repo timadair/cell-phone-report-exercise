@@ -9,6 +9,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 @ToString
 public class EmployeeUsageSummary {
@@ -27,6 +28,19 @@ public class EmployeeUsageSummary {
   }
 
   public void addUsageEntry(UsageEntry usageEntry) {
+    if (!this.employeeId.equals(usageEntry.getEmployeeId())) {
+      throw new IllegalStateException("Incorrect employeeId: " + usageEntry.getEmployeeId() + ", expected " + this.employeeId);
+    }
+    YearMonth yearMonth = YearMonth.parse(usageEntry.getDate(), DateTimeFormatter.ofPattern("M'/'d'/'yyyy"));
+    usage.computeIfAbsent(yearMonth, ym -> Pair.of(0, 0.0f));
+    usage.compute(yearMonth, sum(usageEntry));
+  }
 
+  private BiFunction<YearMonth, Pair<Integer, Float>, Pair<Integer, Float>> sum(UsageEntry usageEntry) {
+    return (ym, totalUsage) ->
+        Pair.of(
+            totalUsage.getLeft() + usageEntry.getTotalMinutes(),
+            Math.round((totalUsage.getRight() + usageEntry.getTotalData()) * 100) / 100.0f
+        );
   }
 }
