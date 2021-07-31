@@ -34,9 +34,7 @@ public class CellPhoneUsageReportApp {
     List<CellPhone> employeePhones = dataService.getCellPhoneRecords(CELL_PHONE_CSV_PATH);
     List<UsageEntry> usageEntries = dataService.getUsageRecords(USAGE_CSV_PATH);
 
-
-
-    pdfService.render(employeePhones, REPORT_FILE_DEST, reportStartDate, reportEndDate);
+    pdfService.renderMonthlyCellPhoneUsageReport(employeePhones, REPORT_FILE_DEST, reportStartDate, reportEndDate);
 
 //    printPDFFile(Paths.get(REPORT_FILE_DEST));
 //    Files.delete(Paths.get(REPORT_FILE_DEST));

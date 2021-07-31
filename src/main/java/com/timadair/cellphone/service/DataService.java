@@ -13,6 +13,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * A class to retrieve persisted data.
+ * Not refined enough to be an API, but stands in place of what would likely be either document ingestion or a database.
+ */
 public class DataService {
 
   public List<CellPhone> getCellPhoneRecords(String cellPhoneCsvPath) {

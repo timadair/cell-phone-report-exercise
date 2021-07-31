@@ -2,6 +2,9 @@ package com.timadair.cellphone.data;
 
 import lombok.Data;
 
+/**
+ * Data model for persisted cell phone assignment data
+ */
 @Data
 public class CellPhone {
 

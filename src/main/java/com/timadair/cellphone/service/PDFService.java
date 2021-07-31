@@ -12,11 +12,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Renders PDF reports
+ */
 public class PDFService {
 
   public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("LLL dd',' yyyy");
 
-  public void render(List<CellPhone> employeePhones, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate) throws FileNotFoundException {
+  public void renderMonthlyCellPhoneUsageReport(List<CellPhone> employeePhones, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate) throws FileNotFoundException {
     //Initialize PDF document
     PdfWriter writer = new PdfWriter(destinationFilePath);
     PdfDocument pdf = new PdfDocument(writer);
