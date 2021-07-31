@@ -13,6 +13,9 @@ import java.nio.file.StandardOpenOption;
 
 import static java.nio.file.Files.newInputStream;
 
+/**
+ * Prints a PDF file
+ */
 public class PrintService {
   public void printPDFFile(Path samplePdfPath) {
     javax.print.PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
