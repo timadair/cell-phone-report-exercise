@@ -10,6 +10,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
 import com.timadair.cellphone.data.EmployeeUsageSummary;
+import com.timadair.cellphone.data.PhoneUsageReportData;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.FileNotFoundException;
@@ -27,7 +28,7 @@ public class PDFService {
 
   public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("LLL dd',' yyyy");
 
-  public void renderMonthlyCellPhoneUsageReport(Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate, List<YearMonth> monthsCovered) throws FileNotFoundException {
+  public void renderMonthlyCellPhoneUsageReport(PhoneUsageReportData phoneUsageByEmployee, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate, List<YearMonth> monthsCovered) throws FileNotFoundException {
     //Initialize PDF document
     PdfWriter writer = new PdfWriter(destinationFilePath);
     PdfDocument pdf = new PdfDocument(writer);
@@ -47,17 +48,17 @@ public class PDFService {
     document.close();
   }
 
-  private void addReportHeaders(Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, LocalDate reportStartDate, LocalDate reportEndDate, Document document) {
+  private void addReportHeaders(PhoneUsageReportData phoneUsageByEmployee, LocalDate reportStartDate, LocalDate reportEndDate, Document document) {
     document.add(new Paragraph("Report Date: " + LocalDateTime.now().format(DATE_FORMAT)));
     // Assume the report should also include the timespan covered the report should cover.
     // These dates could be extracted from the data, but assuming that not every day will have data, it seems
     //   more likely they'd be passed in as parameters for a database query.
     document.add(new Paragraph("Report Date Range: " + reportStartDate.format(DATE_FORMAT) + " - " + reportEndDate.format(DATE_FORMAT)));
-    document.add(new Paragraph("# Phones: " + phoneUsageByEmployee.size()));
-    document.add(new Paragraph("Total Minutes: " + "Placeholder 3000"));
-    document.add(new Paragraph("Average Minutes per employee: " + "Placeholder 500"));
-    document.add(new Paragraph("Total Data: " + "Placeholder 60 MB"));
-    document.add(new Paragraph("Average Data per employee: " + "Placeholder 10 MB"));
+    document.add(new Paragraph("# Phones: " + phoneUsageByEmployee.getPhoneCount()));
+    document.add(new Paragraph("Total Minutes: " + phoneUsageByEmployee.getTotalMinutes()));
+    document.add(new Paragraph("Average Minutes per employee: " + phoneUsageByEmployee.getAverageMinutes()));
+    document.add(new Paragraph("Total Data: " + phoneUsageByEmployee.getTotalData() + " MB"));
+    document.add(new Paragraph("Average Data per employee: " + phoneUsageByEmployee.getAverageData() + " MB"));
   }
 
   private void addTableHeaders(List<YearMonth> monthsCovered, Table detailsTable) {
@@ -83,8 +84,8 @@ public class PDFService {
     return cell;
   }
 
-  private void addTableDetails(Table detailsTable, Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, List<YearMonth> monthsCovered) {
-    phoneUsageByEmployee.entrySet().stream()
+  private void addTableDetails(Table detailsTable, PhoneUsageReportData phoneUsageByEmployee, List<YearMonth> monthsCovered) {
+    phoneUsageByEmployee.getUsageByEmployee().entrySet().stream()
         .sorted(Map.Entry.comparingByKey())
         .forEachOrdered(e -> {
           EmployeeUsageSummary usageSummary = e.getValue();

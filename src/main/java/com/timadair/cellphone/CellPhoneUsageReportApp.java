@@ -2,6 +2,7 @@ package com.timadair.cellphone;
 
 import com.timadair.cellphone.data.CellPhone;
 import com.timadair.cellphone.data.EmployeeUsageSummary;
+import com.timadair.cellphone.data.PhoneUsageReportData;
 import com.timadair.cellphone.data.UsageEntry;
 import com.timadair.cellphone.service.DataProcessingService;
 import com.timadair.cellphone.service.DataService;
@@ -54,10 +55,10 @@ public class CellPhoneUsageReportApp {
 
     List<CellPhone> employeePhones = dataService.getCellPhoneRecords(cellPhoneCsvPath);
     List<UsageEntry> usageEntries = dataService.getUsageRecords(cellPhoneUsageCsvPath);
-    Map<Integer, EmployeeUsageSummary> phoneUsage = dataProcessingService.processPhoneUsage(employeePhones, usageEntries);
+    PhoneUsageReportData reportData = dataProcessingService.processPhoneUsage(employeePhones, usageEntries);
     List<YearMonth> monthsCovered = dataProcessingService.getMonths(reportStartDate, reportEndDate);
 
-    pdfService.renderMonthlyCellPhoneUsageReport(phoneUsage, REPORT_FILE_DEST, reportStartDate, reportEndDate, monthsCovered);
+    pdfService.renderMonthlyCellPhoneUsageReport(reportData, REPORT_FILE_DEST, reportStartDate, reportEndDate, monthsCovered);
 
 //    printPDFFile(Paths.get(REPORT_FILE_DEST));
 //    Files.delete(Paths.get(REPORT_FILE_DEST));

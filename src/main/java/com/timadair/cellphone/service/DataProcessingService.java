@@ -2,6 +2,7 @@ package com.timadair.cellphone.service;
 
 import com.timadair.cellphone.data.CellPhone;
 import com.timadair.cellphone.data.EmployeeUsageSummary;
+import com.timadair.cellphone.data.PhoneUsageReportData;
 import com.timadair.cellphone.data.UsageEntry;
 
 import java.time.LocalDate;
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 public class DataProcessingService {
 
-  public Map<Integer, EmployeeUsageSummary> processPhoneUsage(List<CellPhone> phones, List<UsageEntry> usage) {
+  public PhoneUsageReportData processPhoneUsage(List<CellPhone> phones, List<UsageEntry> usage) {
     HashMap<Integer, EmployeeUsageSummary> phoneUsageByEmployeeId = new HashMap<>();
     for (CellPhone phone : phones) {
       phoneUsageByEmployeeId.put(phone.getEmployeeId(), new EmployeeUsageSummary(phone));
@@ -26,7 +27,7 @@ public class DataProcessingService {
     for (UsageEntry usageEntry : usage) {
       phoneUsageByEmployeeId.get(usageEntry.getEmployeeId()).addUsageEntry(usageEntry);
     }
-    return phoneUsageByEmployeeId;
+    return new PhoneUsageReportData(phoneUsageByEmployeeId);
   }
 
   public List<YearMonth> getMonths(LocalDate reportStartDate, LocalDate reportEndDate) {
