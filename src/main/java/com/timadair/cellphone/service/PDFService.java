@@ -8,12 +8,14 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.timadair.cellphone.data.EmployeeUsageSummary;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +34,18 @@ public class PDFService {
     Document document = new Document(pdf);
 
     //HEADERS
+    addReportHeaders(phoneUsageByEmployee, reportStartDate, reportEndDate, document);
+
+    // DETAILS
+    Table detailsTable = new Table(4 + monthsCovered.size() * 2);
+    addTableHeaders(monthsCovered, detailsTable);
+    addTableDetails(detailsTable, phoneUsageByEmployee, monthsCovered);
+
+    document.add(detailsTable);
+    document.close();
+  }
+
+  private void addReportHeaders(Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, LocalDate reportStartDate, LocalDate reportEndDate, Document document) {
     document.add(new Paragraph("Report Date: " + LocalDateTime.now().format(DATE_FORMAT)));
     // Assume the report should also include the timespan covered the report should cover.
     // These dates could be extracted from the data, but assuming that not every day will have data, it seems
@@ -42,9 +56,9 @@ public class PDFService {
     document.add(new Paragraph("Average Minutes per employee: " + "Placeholder 500"));
     document.add(new Paragraph("Total Data: " + "Placeholder 60 MB"));
     document.add(new Paragraph("Average Data per employee: " + "Placeholder 10 MB"));
+  }
 
-    // DETAILS
-    Table detailsTable = new Table(4 + monthsCovered.size() * 2);
+  private void addTableHeaders(List<YearMonth> monthsCovered, Table detailsTable) {
     detailsTable.addHeaderCell("Employee ID");
     detailsTable.addHeaderCell("Name");
     detailsTable.addHeaderCell("Model");
@@ -54,8 +68,23 @@ public class PDFService {
       headerCell.add(new Paragraph(yearMonth.format(DateTimeFormatter.ofPattern("LLL yyyy"))));
       detailsTable.addHeaderCell(headerCell);
     }
+  }
 
-    document.add(detailsTable);
-    document.close();
+  private void addTableDetails(Table detailsTable, Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, List<YearMonth> monthsCovered) {
+    phoneUsageByEmployee.entrySet().stream()
+        .sorted(Map.Entry.comparingByKey())
+        .forEachOrdered(e -> {
+          EmployeeUsageSummary usageSummary = e.getValue();
+          detailsTable.addCell(usageSummary.getEmployeeId().toString());
+          detailsTable.addCell(usageSummary.getEmployeeName());
+          detailsTable.addCell(usageSummary.getPhoneModel());
+          detailsTable.addCell(usageSummary.getPhonePurchaseDate().format(DATE_FORMAT));
+          Map<YearMonth, Pair<Integer, Float>> usage = usageSummary.getUsage();
+          for (YearMonth yearMonth : monthsCovered) {
+            detailsTable.addCell("0");
+            detailsTable.addCell("0.0 MB");
+          }
+        });
+
   }
 }
