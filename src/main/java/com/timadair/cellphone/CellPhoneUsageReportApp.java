@@ -2,6 +2,7 @@ package com.timadair.cellphone;
 
 import com.timadair.cellphone.data.CellPhone;
 import com.timadair.cellphone.service.DataService;
+import com.timadair.cellphone.service.PDFService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
 
@@ -10,6 +11,7 @@ import javax.print.PrintServiceLookup;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -19,15 +21,20 @@ import static java.nio.file.Files.newInputStream;
 
 public class CellPhoneUsageReportApp {
 
-  public static final Path SAMPLE_PDF_PATH = Paths.get("./src/test/resources/pdf-sample.pdf");
   public static final String CELL_PHONE_CSV_PATH = "./src/main/resources/CellPhone.csv";
+  public static final String REPORT_FILE_DEST = "./src/main/resources/tmp/UsageReport.pdf";
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     DataService dataService = new DataService();
+    PDFService pdfService = new PDFService();
     List<CellPhone> employeePhones = dataService.getCellPhoneRecords(CELL_PHONE_CSV_PATH);
     System.out.println(employeePhones);
 
-//    printPDFFile(SAMPLE_PDF_PATH);
+    pdfService.render(employeePhones, REPORT_FILE_DEST);
+
+    printPDFFile(Paths.get(REPORT_FILE_DEST));
+
+    Files.delete(Paths.get(REPORT_FILE_DEST));
   }
 
   private static void printPDFFile(Path samplePdfPath) {

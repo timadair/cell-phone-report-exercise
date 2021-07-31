@@ -13,3 +13,6 @@ For parsing CSV files
  
 **Lombok**  
 To auto-generate constructors, getters, setters, etc.  Reduces amount of uninteresting code to test.
+
+**iText 7**  
+I have experience working with previous versions of iText.  Assuming you want to keep your code closed course, iText should not be used in a production environment without obtaining a commercial license, due to the APGL of the free version.  It is, however, useful for a proof of concept.
