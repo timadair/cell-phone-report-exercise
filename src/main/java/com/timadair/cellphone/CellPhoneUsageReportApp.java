@@ -1,6 +1,7 @@
 package com.timadair.cellphone;
 
 import com.timadair.cellphone.data.CellPhone;
+import com.timadair.cellphone.data.UsageEntry;
 import com.timadair.cellphone.service.DataService;
 import com.timadair.cellphone.service.PDFService;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -21,6 +22,7 @@ import static java.nio.file.Files.newInputStream;
 public class CellPhoneUsageReportApp {
 
   public static final String CELL_PHONE_CSV_PATH = "./src/main/resources/CellPhone.csv";
+  public static final String USAGE_CSV_PATH = "./src/main/resources/CellPhoneUsageByMonth.csv";
   public static final String REPORT_FILE_DEST = "./src/main/resources/tmp/UsageReport.pdf";
 
   public static void main(String[] args) throws IOException {
@@ -30,6 +32,9 @@ public class CellPhoneUsageReportApp {
     DataService dataService = new DataService();
     PDFService pdfService = new PDFService();
     List<CellPhone> employeePhones = dataService.getCellPhoneRecords(CELL_PHONE_CSV_PATH);
+    List<UsageEntry> usageEntries = dataService.getUsageRecords(USAGE_CSV_PATH);
+
+
 
     pdfService.render(employeePhones, REPORT_FILE_DEST, reportStartDate, reportEndDate);
 
