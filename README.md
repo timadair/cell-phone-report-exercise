@@ -11,3 +11,5 @@ PDFBox worked for my local printer, and is more likely to work for more printers
 **Apache Commons CSV**  
 For parsing CSV files
  
+**Lombok**  
+To auto-generate constructors, getters, setters, etc.  Reduces amount of uninteresting code to test.
