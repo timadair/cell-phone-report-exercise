@@ -1,15 +1,20 @@
 package com.timadair.cellphone.service;
 
+import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
 import com.timadair.cellphone.data.EmployeeUsageSummary;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,10 +24,11 @@ public class PDFService {
 
   public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("LLL dd',' yyyy");
 
-  public void renderMonthlyCellPhoneUsageReport(Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate) throws FileNotFoundException {
+  public void renderMonthlyCellPhoneUsageReport(Map<Integer, EmployeeUsageSummary> phoneUsageByEmployee, String destinationFilePath, LocalDate reportStartDate, LocalDate reportEndDate, List<YearMonth> monthsCovered) throws FileNotFoundException {
     //Initialize PDF document
     PdfWriter writer = new PdfWriter(destinationFilePath);
     PdfDocument pdf = new PdfDocument(writer);
+    pdf.setDefaultPageSize(PageSize.Default.rotate());
     Document document = new Document(pdf);
 
     //HEADERS
@@ -38,7 +44,18 @@ public class PDFService {
     document.add(new Paragraph("Average Data per employee: " + "Placeholder 10 MB"));
 
     // DETAILS
-    document.add(new Paragraph(phoneUsageByEmployee.toString()));
+    Table detailsTable = new Table(4 + monthsCovered.size() * 2);
+    detailsTable.addHeaderCell("Employee ID");
+    detailsTable.addHeaderCell("Name");
+    detailsTable.addHeaderCell("Model");
+    detailsTable.addHeaderCell("Purchase Date");
+    for (YearMonth yearMonth : monthsCovered) {
+      Cell headerCell = new Cell(1, 2);
+      headerCell.add(new Paragraph(yearMonth.format(DateTimeFormatter.ofPattern("LLL yyyy"))));
+      detailsTable.addHeaderCell(headerCell);
+    }
+
+    document.add(detailsTable);
     document.close();
   }
 }

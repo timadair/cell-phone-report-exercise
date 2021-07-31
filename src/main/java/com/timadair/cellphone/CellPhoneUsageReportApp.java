@@ -14,9 +14,12 @@ import javax.print.PrintServiceLookup;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 
@@ -24,22 +27,37 @@ import static java.nio.file.Files.newInputStream;
 
 public class CellPhoneUsageReportApp {
 
-  public static final String CELL_PHONE_CSV_PATH = "./src/main/resources/CellPhone.csv";
-  public static final String USAGE_CSV_PATH = "./src/main/resources/CellPhoneUsageByMonth.csv";
   public static final String REPORT_FILE_DEST = "./src/main/resources/tmp/UsageReport.pdf";
 
   public static void main(String[] args) throws IOException {
+    // Acting as though these were arguments passed in.
     LocalDate reportStartDate = LocalDate.parse("2017-09-21");
     LocalDate reportEndDate = LocalDate.parse("2018-09-20");
+    String cellPhoneCsvPath = "./src/main/resources/CellPhone.csv";
+    String cellPhoneUsageCsvPath = "./src/main/resources/CellPhoneUsageByMonth.csv";
+
+    // Potential improvement: replace this with usage output.
+    if (reportStartDate.isAfter(reportEndDate)) {
+      System.out.println("Report should not end before it starts");
+      return;
+    } else if (Files.notExists(Paths.get(cellPhoneCsvPath))) {
+      System.out.println("Unable to find file " + cellPhoneCsvPath);
+      return;
+    } else if (Files.notExists(Paths.get(cellPhoneUsageCsvPath))) {
+      System.out.println("Unable to find file " + cellPhoneUsageCsvPath);
+      return;
+    }
 
     DataService dataService = new DataService();
     PDFService pdfService = new PDFService();
     DataProcessingService dataProcessingService = new DataProcessingService();
 
-    List<CellPhone> employeePhones = dataService.getCellPhoneRecords(CELL_PHONE_CSV_PATH);
-    List<UsageEntry> usageEntries = dataService.getUsageRecords(USAGE_CSV_PATH);
+    List<CellPhone> employeePhones = dataService.getCellPhoneRecords(cellPhoneCsvPath);
+    List<UsageEntry> usageEntries = dataService.getUsageRecords(cellPhoneUsageCsvPath);
     Map<Integer, EmployeeUsageSummary> phoneUsage = dataProcessingService.processPhoneUsage(employeePhones, usageEntries);
-    pdfService.renderMonthlyCellPhoneUsageReport(phoneUsage, REPORT_FILE_DEST, reportStartDate, reportEndDate);
+    List<YearMonth> monthsCovered = dataProcessingService.getMonths(reportStartDate, reportEndDate);
+
+    pdfService.renderMonthlyCellPhoneUsageReport(phoneUsage, REPORT_FILE_DEST, reportStartDate, reportEndDate, monthsCovered);
 
 //    printPDFFile(Paths.get(REPORT_FILE_DEST));
 //    Files.delete(Paths.get(REPORT_FILE_DEST));
